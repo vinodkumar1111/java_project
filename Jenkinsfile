@@ -42,27 +42,33 @@ pipeline {
                         sh 'mvn checkstyle:checkstyle'
                     }
                 }
-
             }
         }
-        stage ('SonarQube Analysis')
-        {
-            steps{
+
+        stage('SonarQube Analysis') {
+            steps {
                 script {
                     echo 'Scanning with SonarQube...'
-                    sh "mvn sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=sonar-token"
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh "mvn sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=${SONAR_TOKEN}"
                     }
                 }
             }
         }
-        stage ('Quality Gate'){
-            steps{
-                //pause pipeline and wait for SonarQube to give a verdict (Pass/Fail)
-                timeout(time: 5, unit: 'MINUTES'){
-                    waitForQualityGate(abortPipeline: true) 
+
+        stage('Quality Gate') {
+            steps {
+                // Pause pipeline and wait for SonarQube to give a verdict (Pass/Fail)
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate(abortPipeline: true)
                 }
             }
         }
     }
+
+    post {
+        failure {
+            slackSend (channel: '#builds', message: "Build failed!")
+        }
+    }
 }
-    
