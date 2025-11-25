@@ -59,9 +59,10 @@ pipeline {
             steps{
                 //pause pipeline and wait for SonarQube to give a verdict (Pass/Fail)
                 timeout(time: 5, unit: 'MINUTES'){
-                    waitForQualityGate(wait: true, sonarQube: 'SonarQube', abortPipeline: true)
+                    waitForQualityGate()
                 }
             }
         }
     }
 }
+    
