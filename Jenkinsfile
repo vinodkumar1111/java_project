@@ -51,7 +51,7 @@ pipeline {
                 script {
                     echo 'Scannning with SonarQube..'
                     //This wrapper injects the token and url automatically
-                    sh 'mvn sonar:sonar -Dsonar.host.url=http://sonarqube:9000'
+                    sh 'mvn sonar:sonar -Dsonar.host.url=http://localhost:9000'
                 }
             }
         }
